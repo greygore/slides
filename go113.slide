@@ -1,0 +1,213 @@
+Go 1.13
+Incrementally better
+24 Sep 2019
+Tags: go
+
+Gregory Wood
+Senior Software Engineer, Samsara
+gregory.wood@samsara.com
+http://samsara.com/
+
+* Overview
+
+Released 3 September 2019
+
+Highlights:
+
+- Go Module mirror
+
+- Error wrapping
+
+- Number literal improvements
+
+* Not Comprehensive
+
+Full details: [[https://golang.org/doc/go1.13][Release Notes]]
+
+* Generics!!!
+
+* Generics
+
+Are *not* in 1.13...
+
+_Sorry._
+
+There is a [[https://github.com/golang/proposal/blob/master/design/go2draft-contracts.md][generics proposal]].
+
+See Ian Lance Taylor's Gophercon 2019 talk for more details:
+
+.image images/generics-in-go-thumbnail.png _ 500
+
+* Go Module mirror
+
+* Go Module mirror
+
+- Speeds up downloads
+
+- Prevents dependencies from disappearing
+
+* Go Module mirror
+
+`go` `get` will now use the official module mirror by default
+
+- Proxy: [[https://proxy.golang.org]]
+
+A module mirror that will be used to download versions of publically available code.
+
+- Checksum database: [[https://sum.golang.org]]
+
+Authenticates versioned code to prevent unauthorized modification of code.
+
+- Index: [[https://index.golang.org]]
+
+JSON feed of new module versions published through the official proxy.
+
+* Go Module mirror
+
+By default Go will use Google's default proxy, or direct download if not found.
+
+`GOPROXY` to use your own proxy...
+
+Or another public one like [[https://athens.azurefd.net]] (experimental)
+
+Or create a comma separated heirarchy.
+
+Or set to `GOPROXY=direct` to opt out of proxies entirely.
+
+To opt out of downloading modules at all, use `GOPROXY=off`
+
+* Other module improvements
+
+`GO111MODULE` is still `auto`, but works even inside `GOPATH`.
+
+`GOPRIVATE` indicates non-public module paths.
+
+`go` `get`:
+
+- `@latest` will get the newest minor release.
+
+- `@upgrade` will get the newest minor release... but won't downgrade from a release candidate.
+
+- `@patch` will get the latest patch release (v1.2.x)... and also won't downgrade.
+
+* Error wrapping
+
+* Error wrapping
+
+Most errors are just strings... concatenated strings. Bleah.
+
+Even if you have your own error type, it can get polluted by a package higher up the stack. Can no longer match on sentinel errors.
+
+Wrapping errors allows us to create a meaningful chain of errors that we can still examine.
+
+* Error wrapping
+
+To take advantage of error wrapping, add method:
+
+.code go113.go /START UNWRAP INTERFACE OMIT/,/END UNWRAP INTERFACE OMIT/
+
+* Error wrapping
+
+To get to the next error in a chain:
+
+.code go113.go /START UNWRAP DEFINITION OMIT/,/END UNWRAP DEFINITION OMIT/
+
+To see if any errors in the chain match a given error:
+
+.code go113.go /START IS DEFINITION OMIT/,/END IS DEFINITION OMIT/
+
+For example:
+
+.code go113.go /START IS EXAMPLE1 OMIT/,/END IS EXAMPLE1 OMIT/
+
+or
+
+.code go113.go /START IS EXAMPLE2 OMIT/,/END IS EXAMPLE2 OMIT/
+
+* Error wrapping
+
+Find a matching error type and start using it:
+
+.code go113.go /START AS DEFINITION OMIT/,/END AS DEFINITION OMIT/
+
+For example:
+
+.play go113.go /START AS EXAMPLE OMIT/,/END AS EXAMPLE OMIT/
+
+* Error wrapping
+
+`fmt.Errorf()` now supports `%w`
+
+`%w` behaves identical to `%v`, but is only for wrapped errors.
+
+* Number Literals
+
+* Number Literals
+
+- Binary integer literals: `0b01100110`
+
+- Octal integer literals: `0o660`
+
+- Hecadecimal floating point literals: `0x1.0p-1021`
+
+- Imaginary literals: Huh?
+
+* Number literals
+
+Digit separator: `_` (underscore):
+
+- `1_000_000_000`
+
+- `0x_DEAD_BEEF`
+
+- `0b_11_000000`
+
+* Other improvements
+
+* Escape Analysis
+
+More memory allocated on the stack rather than the heap
+
+* Out of range panics
+
+Now include the index and length of the slice:
+
+.code go113.go /START INDEX PANIC OMIT/,/END INDEX PANIC OMIT/
+
+* TLS 1.3
+
+Is now default.
+
+Can be disabled by adding `tls13=0` to `GODEBUG`.
+
+Opt-out will be gone in 1.14.
+
+* database/sql
+
+Now has a `NullTime`.
+
+How did this take until 1.13?!
+
+I personally will stick to pointers for nullable fields.
+
+* reflect
+
+`Value.IsZero()` does what you'd expect
+
+* sync.Pool
+
+No longer increase stop-the-world pause times.
+
+No more complete repopulation after every garbage collection.
+
+* godoc
+
+Webserver is now removed from main distribution.
+
+To manually install it:
+
+.code go113.go /START godoc OMIT/,/END godoc OMIT/
+
+* Lots of other changes
+
+Again, full details are in the [[https://golang.org/doc/go1.13][Release Notes]]
