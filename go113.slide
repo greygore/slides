@@ -104,31 +104,35 @@ Wrapping errors allows us to create a meaningful chain of errors that we can sti
 
 To take advantage of error wrapping, add method:
 
-.code go113.go /START UNWRAP INTERFACE OMIT/,/END UNWRAP INTERFACE OMIT/
+ Unwrap() error
 
 * Error wrapping
 
 To get to the next error in a chain:
 
-.code go113.go /START UNWRAP DEFINITION OMIT/,/END UNWRAP DEFINITION OMIT/
+    errors.Unwrap(err error) error
 
 To see if any errors in the chain match a given error:
 
-.code go113.go /START IS DEFINITION OMIT/,/END IS DEFINITION OMIT/
+    errors.Is(err, target error) bool
 
 For example:
 
-.code go113.go /START IS EXAMPLE1 OMIT/,/END IS EXAMPLE1 OMIT/
+    if errors.Is(err, sql.ErrNoRows) {
+        return 0
+    }
 
 or
 
-.code go113.go /START IS EXAMPLE2 OMIT/,/END IS EXAMPLE2 OMIT/
+    if errors.Is(err, io.EOF) {
+        log.Println("Finished reading file")
+    }
 
 * Error wrapping
 
 Find a matching error type and start using it:
 
-.code go113.go /START AS DEFINITION OMIT/,/END AS DEFINITION OMIT/
+    errors.As(err error, target interface{}) bool
 
 For example:
 
@@ -144,11 +148,14 @@ For example:
 
 * Number Literals
 
-- Binary integer literals: `0b01100110`
+- Binary integer literals: 
+    0b01100110
 
-- Octal integer literals: `0o660`
+- Octal integer literals: 
+    0o660
 
-- Hecadecimal floating point literals: `0x1.0p-1021`
+- Hecadecimal floating point literals:
+    0x1.0p-1021
 
 - Imaginary literals: Huh?
 
@@ -156,11 +163,14 @@ For example:
 
 Digit separator: `_` (underscore):
 
-- `1_000_000_000`
+- Thousands
+    1_000_000_000
 
-- `0x_DEAD_BEEF`
+- Hexadecimal words
+    0x_DEAD_BEEF
 
-- `0b_11_000000`
+- Significant bits
+    0b_11_000000
 
 * Other improvements
 
@@ -172,7 +182,7 @@ More memory allocated on the stack rather than the heap
 
 Now include the index and length of the slice:
 
-.code go113.go /START INDEX PANIC OMIT/,/END INDEX PANIC OMIT/
+    runtime error: index out of range [3] with length 1
 
 * TLS 1.3
 
@@ -206,7 +216,7 @@ Webserver is now removed from main distribution.
 
 To manually install it:
 
-.code go113.go /START godoc OMIT/,/END godoc OMIT/
+    go get golang.org/x/tools/cmd/godoc
 
 * Lots of other changes
 
