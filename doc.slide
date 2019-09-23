@@ -1,0 +1,355 @@
+What the hell does this do?
+Documenting Code in Go
+24 Sep 2019
+Tags: go, godoc
+
+Gregory Wood
+Senior Software Engineer, Samsara
+gregory.wood@samsara.com
+http://samsara.com/
+
+* About Me
+
+I've been programming professionally for almost 20 years.
+
+Started just after Y2K was a thing people worried about:
+
+.image images/bestbuy-y2k.jpg _ 500
+
+* About Me
+
+Programming for 30+ years.
+
+Started with BASIC on this 8K monster:
+
+.image images/atari-800.jpg _ 600
+
+* About Me
+
+Not a humble brag.
+
+I've written a _LOT_ of bad code.
+
+Days after I'd written it, even I had no idea what the hell it did.
+
+* Why Document?
+
+Collaboration!
+
+Working with other developers.
+
+- What does this do?
+
+- How does it do it?
+
+* Collaboration is...
+
+- How you become a better programmer.
+
+- How you write better programs.
+
+* Why Document?
+
+- Your users are often other developers.
+
+* Documenting Code in Go
+
+* Comments
+
+* Comments
+
+    // Single line comments
+
+    var commentsAreGood = true // Can also be after code
+
+or
+
+    /*
+        Multiline
+        comments
+    */
+
+* Godoc comments
+
+Can be used to automatically generate documentation.
+
+Can be used to document exported:
+
+- `type`
+- `var`
+- `const`
+- `func`
+- `package`
+
+* Godoc comments
+
+Can be used to generate:
+
+- Plain text documentation
+- HTML documentation
+- Unix man pages
+- Documentation in your IDE!
+
+* Godoc comments
+
+Godoc is similar to Java's JavaDoc or Python's Docstring.
+
+Does not require a complex DSL.
+
+* Godoc comments
+
+Convention is a complete sentence beginning with the identifying name, with no intervening blank line:
+
+    // Foo takes a Bar and transforms it into a Baz.
+    // Additional information on subsequent lines...
+    func Foo(bar Bar) Baz {
+        // ...
+    }
+
+Real example from `fmt`:
+
+    // Fprint formats using the default formats for its operands and writes to w.
+    // Spaces are added between operands when neither is a string.
+    // It returns the number of bytes written and any write error encountered.
+    func Fprint(w io.Writer, a ...interface{}) (n int, err error) {
+
+* Godoc comments
+
+A package can have extended blocks of information.
+
+    Indented text
+    
+    Forms formatted code blocks.
+
+Sections can be made by putting a label on a line before a paragraph.
+
+URLs are automatically turned into links.
+
+By convention, extended documentation is put into `doc.go`.
+
+* Godoc example - Part 1
+
+.code ./example/example.go //,/\)/
+
+* Godoc example - Part 2
+
+.code ./example/example.go /var \(/,
+
+* Godoc example - Plain text (package)
+
+    $ go doc ./example
+    package example // import "."
+
+    Package example is just an empty example of what a package documentation can
+    look like.
+
+        // It can contain preformatted code blocks.
+
+
+    Sections
+
+    The package documentation can also contain sections
+
+    const MyFalseConstant = false
+    var MyFoo = Foo{}
+    type Foo struct{ ... }
+        func NewFoo(bar int) Foo
+
+* Godoc example - Plain text (type Foo)
+
+    $ go doc ./example Foo
+    package example // import "./example"
+
+    type Foo struct {
+        Bar int // Every foo has a bar
+        // Has unexported fields.
+    }
+        Foo is a simple struct exported and unexported fields.
+
+    func NewFoo(bar int) Foo
+    func (f *Foo) Baz() string
+
+and
+
+    $ go doc ./example Foo.Baz
+    package example // import "./example"
+
+    func (f *Foo) Baz() string
+        Baz returns a Foo's baz value
+
+* Godoc example - HTML
+
+.iframe https://www.godoc.org/github.com/greygore/slides/example 600 1000
+
+* go doc - Plain text documentation
+
+	go doc
+	go doc <pkg>
+	go doc <sym>[.<method>]
+	go doc [<pkg>].<sym>[.<method>]
+	go doc <pkg> <sym>[.<method>]
+
+Plain text output.
+
+Not comprehensive.
+
+* godoc - HTML documentation
+
+As of 1.13 is no longer part of the standard distribution.
+
+    go get golang.org/x/tools/cmd/godoc
+
+* godoc - HTML documentation
+
+    godoc -http=:6060
+
+The root looks like the standard Go website found at [[https://golang.org]].
+
+Go to Packages and scroll past "Standard library" to get to "Third party".
+
+"Third party" contains all packages in your `$GOPATH`.
+
+    open http://localhost:6060/pkg/#thirdparty
+
+* godoc - HTML documentation
+
+To output raw HTML to save as a static file:
+
+    godoc -url /pkg/full/package/name > package.html
+
+You will still need various static files if you wanted to serve these statically.
+
+* godoc - HTML documentation
+
+When shown from web server, the `m` URL param can modify output:
+
+- `all` - shows all declarations, exported or not
+- `methods` - shows all embedded methods
+- `src` - shows the original source code
+- `flat` - lists packages by fully qualified name and not heirarchically
+
+* godoc.org
+
+Any publically accessible packages are available at [[https://godoc.org]]
+
+If your package is public but not indexed, just perform a search and it will appear.
+
+Force package to update with "Refresh now".
+
+Add "`?tools`" to path to get GoDoc badge for your repo.
+
+* Advanced topics - Bug labelling
+
+Top level comments beginning with:
+
+    BUG(who)
+
+Will be added to the "Bugs" section of documentation.
+
+For example:
+
+    // BUG(greygore): Foo methods will panic if Bar is set to a negative number.
+
+* Advanced topics - Examples
+
+In any test file, any `func` starting with `Example` will show up under Examples:
+
+    // This demonstrates how to create a new client and connect
+    func ExampleNewClient() {
+        cfg := Config{Port: 6060}
+        client := NewClient(cfg)
+        if err := client.Connect(); err != nil {
+            panic(err)
+        }
+        fmt.Println("client connected")
+        // Output:
+        // client connected
+    }
+
+* Advanced topics - Examples
+
+Because this is an actual code file and not a comment:
+
+- The compiler will check the file for validity.
+
+- Comments prefixed with "Output:" will be compared to the standard output.
+
+- The example can be run from the documentation.
+
+* Advanced topics - Examples
+
+    func Example() {}       // package
+    func ExampleF() {}      // func F
+    func ExampleT() {}      // type T
+    func ExampleT_M() {}    // type T, method M
+
+Add a suffix to have multiple examples:
+
+    func Example_suffix() {}       // package
+    func ExampleF_suffix() {}      // func F
+    func ExampleT_suffix() {}      // type T
+    func ExampleT_M_suffix() {}    // type T, method M
+
+* Advanced topics - present
+
+    go get golang.org/x/tools/present
+
+This presentation uses the present tool.
+
+Single `.slide` file contains the entire presentation.
+
+* Advanced topics - present
+
+Header
+
+    Title of document
+    Subtitle of document
+    15:04 2 Jan 2006
+    Tags: foo, bar, baz
+    <blank line>
+    Author Name
+    Job title, Company
+    joe@example.com
+    http://url/
+    @twitter_name
+
+* Advanced topics - present
+
+Format
+
+    * Title of slide or section (must have asterisk)
+
+    Some Text
+
+    ** Subsection
+
+    - bullets
+    - more bullets
+    - a bullet with
+
+    *** Sub-subsection
+
+    Some More text
+
+        Preformatted text
+        is indented (however you like)
+
+* Advanced topics - present
+
+    .code x.go /^func main/,/^}/
+    .play y.go
+    .image image.jpg
+    .background image.jpg
+    .iframe http://foo
+    .link http://foo label
+    .html file.html
+    .caption _Gopher_ by [[https://www.instagram.com/reneefrench/][Renée French]]
+
+* Advanced topics - present
+
+[[https://talks.godoc.org/]]
+
+    https://talks.godoc.org/github.com/owner/project/sub/directory/file.slide
+
+Also supports `.article`
+
